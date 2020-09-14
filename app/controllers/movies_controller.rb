@@ -12,15 +12,42 @@ class MoviesController < ApplicationController
 
   def index
     @movies = Movie.all
-    @movies = Movie.order(params[:sort_header])
+    #@movies = Movie.order(params[:sort_header])
+    
+    #redirect flag is used to suggest if a url must be redirected based on session parameters
+    redirect_flag=0
+    
+    if params[:sort_header]
+     #@sort_order = params[:order]
+      @movies = Movie.order(params[:sort_header])
+      session[:sort_header]=params[:sort_header]
+    elsif session[:sort_header]
+      #@sort_order = session[:order]
+      @movies = Movie.order(session[:sort_header])
+      redirect_flag = 1
+      
+    end
+    
     @all_ratings = Movie.all_ratings
+    
     if params[:ratings]
       @ratings=params[:ratings]
+      session[:ratings] = @ratings
       @movies=@movies.where(rating: @ratings.keys)
-    else
-      @ratings=Hash[@all_ratings.collect {|rating| [rating, rating]}]
-      @movies=@movies
+    elsif session[:ratings]
+      @ratings=session[:ratings]
+      @movies=@movies.where(rating: @ratings.keys)
+      redirect_flag = 1
+    #else  
+      #@movies=@movies
     end 
+    
+    if redirect_flag==1
+      flash.keep
+      redirect_to movies_path(sort_header: session[:sort_header],ratings: session[:ratings])
+    end
+    
+    
   end
 
   def new
