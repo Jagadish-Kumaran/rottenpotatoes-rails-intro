@@ -29,7 +29,7 @@ class MoviesController < ApplicationController
     end
     
     @all_ratings = Movie.all_ratings
-    
+    @ratings=@all_ratings
     if params[:ratings]
       @ratings=params[:ratings]
       session[:ratings] = @ratings
@@ -38,8 +38,6 @@ class MoviesController < ApplicationController
       @ratings=session[:ratings]
       @movies=@movies.where(rating: @ratings.keys)
       redirect_flag = 1
-    #else  
-      #@movies=@movies
     end 
     
     if redirect_flag==1
